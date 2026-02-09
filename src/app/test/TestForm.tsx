@@ -21,17 +21,25 @@ export default function TestForm({
 }: TestFormProps) {
   const [internalAnswers, setInternalAnswers] = useState<Answers>({});
   const answers = value !== undefined ? value : internalAnswers;
-  const setAnswers = onChange ?? setInternalAnswers;
 
   const handleOptionClick = (questionId: string, value: number) => {
-    setAnswers((prev) => {
-      if (prev[questionId] === value) {
-        const next = { ...prev };
-        delete next[questionId];
-        return next;
+    const prev = answers;
+    if (prev[questionId] === value) {
+      const next = { ...prev };
+      delete next[questionId];
+      if (onChange) {
+        onChange(next);
+      } else {
+        setInternalAnswers(next);
       }
-      return { ...prev, [questionId]: value };
-    });
+    } else {
+      const next = { ...prev, [questionId]: value };
+      if (onChange) {
+        onChange(next);
+      } else {
+        setInternalAnswers(next);
+      }
+    }
   };
 
   const getCircleBorderColor = (value: number) => {
