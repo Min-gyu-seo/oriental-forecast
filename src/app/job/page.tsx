@@ -151,15 +151,13 @@ export default function JobCardPage() {
     type: QuestionType,
     source: "pool" | "box1" | "box2"
   ) => {
-    const touch = e.touches[0];
     setTouchDrag({
       type,
       source,
-      startX: touch.clientX,
-      startY: touch.clientY,
+      startX: e.touches[0].clientX,
+      startY: e.touches[0].clientY,
     });
     setDragging(type);
-    e.preventDefault();
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -167,58 +165,69 @@ export default function JobCardPage() {
     e.preventDefault();
   };
 
-  const handleTouchEnd = (
+  const handleTouchEndOnBox = (
     e: React.TouchEvent,
-    targetBox?: "box1" | "box2" | "pool",
-    currentBox?: QuestionType[]
+    targetBox: "box1" | "box2",
+    setBox: React.Dispatch<React.SetStateAction<QuestionType[]>>,
+    currentBox: QuestionType[]
   ) => {
     if (!touchDrag) return;
-    const touch = e.changedTouches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    e.preventDefault();
+    e.stopPropagation();
+
+    const type = touchDrag.type;
+    const source = touchDrag.source;
     
-    // 드롭 영역 찾기
-    let dropTarget: "box1" | "box2" | "pool" | null = null;
-    if (targetBox) {
-      dropTarget = targetBox;
+    if (source === targetBox) {
+      setTouchDrag(null);
+      setDragging(null);
+      return;
+    }
+
+    const alreadyHasOne = currentBox.length >= 1;
+    const currentChar = currentBox[0];
+
+    if (alreadyHasOne) {
+      if (source === "pool") {
+        setBox([type]);
+      } else {
+        setBox1(targetBox === "box1" ? [type] : [currentChar]);
+        setBox2(targetBox === "box2" ? [type] : [currentChar]);
+      }
     } else {
-      // 터치 끝난 위치에서 가장 가까운 드롭 영역 찾기
-      const box1El = document.querySelector('[data-drop-target="box1"]');
-      const box2El = document.querySelector('[data-drop-target="box2"]');
-      const poolEl = document.querySelector('[data-drop-target="pool"]');
-      
-      if (box1El && box1El.contains(element)) dropTarget = "box1";
-      else if (box2El && box2El.contains(element)) dropTarget = "box2";
-      else if (poolEl && poolEl.contains(element)) dropTarget = "pool";
+      if (source === "box1") {
+        setBox1((prev) => removeOne(prev, type));
+      } else if (source === "box2") {
+        setBox2((prev) => removeOne(prev, type));
+      }
+      setBox([type]);
     }
 
-    if (dropTarget === "box1" && touchDrag.source !== "box1") {
-      handleDropOnBox(
-        { preventDefault: () => {}, dataTransfer: { getData: (key: string) => 
-          key === "text/plain" ? touchDrag.type : touchDrag.source 
-        } } as any,
-        setBox1,
-        "box1",
-        box1
-      );
-    } else if (dropTarget === "box2" && touchDrag.source !== "box2") {
-      handleDropOnBox(
-        { preventDefault: () => {}, dataTransfer: { getData: (key: string) => 
-          key === "text/plain" ? touchDrag.type : touchDrag.source 
-        } } as any,
-        setBox2,
-        "box2",
-        box2
-      );
-    } else if (dropTarget === "pool" && (touchDrag.source === "box1" || touchDrag.source === "box2")) {
-      handleDropOnPool({
-        preventDefault: () => {},
-        dataTransfer: {
-          getData: (key: string) =>
-            key === "text/plain" ? touchDrag.type : touchDrag.source,
-        },
-      } as any);
+    setTouchDrag(null);
+    setDragging(null);
+  };
+
+  const handleTouchEndOnPool = (e: React.TouchEvent) => {
+    if (!touchDrag) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const type = touchDrag.type;
+    const source = touchDrag.source;
+
+    if (source === "box1") {
+      setBox1((prev) => removeOne(prev, type));
+    } else if (source === "box2") {
+      setBox2((prev) => removeOne(prev, type));
     }
 
+    setTouchDrag(null);
+    setDragging(null);
+  };
+
+  const handleTouchEndOnCharacter = (e: React.TouchEvent) => {
+    if (!touchDrag) return;
+    // 캐릭터에서 터치가 끝나면 드롭 취소
     setTouchDrag(null);
     setDragging(null);
   };
@@ -260,8 +269,7 @@ export default function JobCardPage() {
             <div
               onDragOver={handleDragOver}
               onDrop={(e) => handleDropOnBox(e, setBox1, "box1", box1)}
-              onTouchEnd={(e) => handleTouchEnd(e, "box1", box1)}
-              data-drop-target="box1"
+              onTouchEnd={(e) => handleTouchEndOnBox(e, "box1", setBox1, box1)}
               className="min-h-[200px] rounded-xl border-2 border-dashed bg-white/80 flex flex-wrap items-center justify-center gap-3 p-4"
               style={{ borderColor: "#C85D5D" }}
             >
@@ -274,7 +282,7 @@ export default function JobCardPage() {
                 onDragEnd={handleDragEnd}
                 onTouchStart={(e) => handleTouchStart(e, type, "box1")}
                 onTouchMove={handleTouchMove}
-                onTouchEnd={(e) => handleTouchEnd(e)}
+                onTouchEnd={handleTouchEndOnCharacter}
               >
                 <Image
                   src={TYPE_CHARACTER_IMAGES[type]}
@@ -303,8 +311,7 @@ export default function JobCardPage() {
             <div
               onDragOver={handleDragOver}
               onDrop={(e) => handleDropOnBox(e, setBox2, "box2", box2)}
-              onTouchEnd={(e) => handleTouchEnd(e, "box2", box2)}
-              data-drop-target="box2"
+              onTouchEnd={(e) => handleTouchEndOnBox(e, "box2", setBox2, box2)}
               className="min-h-[200px] rounded-xl border-2 border-dashed bg-white/80 flex flex-wrap items-center justify-center gap-3 p-4"
               style={{ borderColor: "#3b82f6" }}
             >
@@ -317,7 +324,7 @@ export default function JobCardPage() {
                 onDragEnd={handleDragEnd}
                 onTouchStart={(e) => handleTouchStart(e, type, "box2")}
                 onTouchMove={handleTouchMove}
-                onTouchEnd={(e) => handleTouchEnd(e)}
+                onTouchEnd={handleTouchEndOnCharacter}
               >
                 <Image
                   src={TYPE_CHARACTER_IMAGES[type]}
@@ -388,8 +395,7 @@ export default function JobCardPage() {
         <div
           onDragOver={handleDragOver}
           onDrop={handleDropOnPool}
-          onTouchEnd={(e) => handleTouchEnd(e, "pool")}
-          data-drop-target="pool"
+          onTouchEnd={handleTouchEndOnPool}
           className="flex flex-wrap items-center justify-center gap-4 p-6 rounded-xl border border-slate-200 bg-slate-50/50 min-h-[140px]"
         >
           {ALL_TYPES.map((type) => {
@@ -404,7 +410,7 @@ export default function JobCardPage() {
                 onDragEnd={handleDragEnd}
                 onTouchStart={(e) => canDrag && handleTouchStart(e, type, "pool")}
                 onTouchMove={handleTouchMove}
-                onTouchEnd={(e) => handleTouchEnd(e)}
+                onTouchEnd={handleTouchEndOnCharacter}
                 className={`flex flex-col items-center gap-1 ${
                   !canDrag
                     ? "opacity-40 pointer-events-none"
