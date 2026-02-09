@@ -14,15 +14,15 @@ export default function Home() {
         />
       </div>
 
-      <div className="relative z-10 w-full flex justify-center pt-16">
-        <h1 className="text-[#2D2D2D] text-5xl font-semibold text-center leading-tight">
+      <div className="relative z-10 w-full flex justify-center pt-8 sm:pt-16">
+        <h1 className="text-[#2D2D2D] text-4xl sm:text-5xl font-semibold text-center leading-tight">
           관계를 알아보는
           <br />
           심리 궁합
         </h1>
       </div>
 
-      <div className="relative z-10 flex-1 flex items-center justify-center w-full max-w-md px-4 -mt-16">
+      <div className="relative z-10 flex-1 flex items-center justify-center w-full max-w-md px-4 mt-6 sm:-mt-16">
         <div className="w-full py-6 px-6 text-[#2D2D2D] text-[17px] leading-relaxed text-center bg-white border-[3px] border-[#2D2D2D]/40 rounded-2xl shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)]">
           서양에서는 &apos;나&apos;를 독립적인 존재로 인식합니다. 그러나 동양에서는 &apos;나&apos;를 타인과의 관계 속에서 존재하는 것으로 인식합니다.
           <br />
