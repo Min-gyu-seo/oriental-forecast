@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { QUESTIONS, TYPE_DISPLAY_NAMES, TYPE_CHARACTER_IMAGES } from "../../../test/questions";
+
+const TEN_STEM_ORDER: QuestionType[] = [
+  "갑", "을", "병", "정", "무", "기", "경", "신", "임", "계",
+];
 import { getTendencyTypes } from "../../../test/getTendency";
-import { getTenStemScores, getFiveElementScores } from "../../../test/calculateScores";
+import { getTenStemScores, getTenStemScoresSimple, getFiveElementScores } from "../../../test/calculateScores";
 import type { QuestionType } from "../../../test/questions";
 import RadarChart from "./RadarChart";
 
@@ -50,6 +54,16 @@ export default function LoverResultView() {
     임: 0,
     계: 0,
   });
+  const [myTenStemScoresSimple, setMyTenStemScoresSimple] = useState<
+    Record<QuestionType, number>
+  >({
+    갑: 0, 을: 0, 병: 0, 정: 0, 무: 0, 기: 0, 경: 0, 신: 0, 임: 0, 계: 0,
+  });
+  const [partnerTenStemScoresSimple, setPartnerTenStemScoresSimple] = useState<
+    Record<QuestionType, number>
+  >({
+    갑: 0, 을: 0, 병: 0, 정: 0, 무: 0, 기: 0, 경: 0, 신: 0, 임: 0, 계: 0,
+  });
 
   useEffect(() => {
     try {
@@ -60,6 +74,10 @@ export default function LoverResultView() {
       setMyTenStemScores(getTenStemScores(LOVER_MY_QUESTIONS, answers));
       setPartnerTenStemScores(
         getTenStemScores(LOVER_PARTNER_QUESTIONS, answers)
+      );
+      setMyTenStemScoresSimple(getTenStemScoresSimple(LOVER_MY_QUESTIONS, answers));
+      setPartnerTenStemScoresSimple(
+        getTenStemScoresSimple(LOVER_PARTNER_QUESTIONS, answers)
       );
     } catch {
       setMyTypes([]);
@@ -168,6 +186,64 @@ export default function LoverResultView() {
                   maxScore={partnerTenStemMax}
                   size={128}
                 />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* [임시] 유형별 점수 표시 — 나중에 제거 */}
+        <section className="mt-12 p-4 rounded-lg bg-slate-100 border border-slate-300">
+          <h2 className="text-sm font-semibold text-slate-600 mb-3">
+            유형별 점수 (임시)
+          </h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-2">나</p>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                {TEN_STEM_ORDER.map((t) => (
+                  <span key={t} className="text-slate-700">
+                    {TYPE_DISPLAY_NAMES[t]}: {myTenStemScores[t].toFixed(1)}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-2">연인</p>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                {TEN_STEM_ORDER.map((t) => (
+                  <span key={t} className="text-slate-700">
+                    {TYPE_DISPLAY_NAMES[t]}: {partnerTenStemScores[t].toFixed(1)}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* [임시] 심플 로직(정재/정관 보너스 없음) 점수 — 나중에 제거 */}
+        <section className="mt-6 p-4 rounded-lg bg-amber-50 border border-amber-200">
+          <h2 className="text-sm font-semibold text-amber-800 mb-3">
+            심플 로직 점수 (임시)
+          </h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs font-medium text-amber-700 mb-2">나</p>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                {TEN_STEM_ORDER.map((t) => (
+                  <span key={t} className="text-slate-700">
+                    {TYPE_DISPLAY_NAMES[t]}: {myTenStemScoresSimple[t].toFixed(1)}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-amber-700 mb-2">연인</p>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                {TEN_STEM_ORDER.map((t) => (
+                  <span key={t} className="text-slate-700">
+                    {TYPE_DISPLAY_NAMES[t]}: {partnerTenStemScoresSimple[t].toFixed(1)}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
