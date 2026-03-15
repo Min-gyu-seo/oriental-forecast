@@ -36,7 +36,7 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="relative z-10 flex flex-col gap-4 mt-auto mb-32">
+      <div className="relative z-10 flex flex-col gap-4 mt-16 sm:mt-auto mb-32 pt-4 sm:pt-0">
         <Link
           href="/my-type"
           className="px-8 py-4 text-lg font-semibold text-[#2D2D2D] bg-white rounded-xl hover:bg-[#F5F3ED] transition-colors shadow-sm border border-[#E8E5DD] text-center"
