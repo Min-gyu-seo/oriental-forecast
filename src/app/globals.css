@@ -83,6 +83,11 @@ body > * {
   font-family: var(--font-nanum-myeongjo), serif;
 }
 
+/* 나눔고딕 폰트 유틸리티 */
+.font-nanum-gothic {
+  font-family: var(--font-nanum-gothic), sans-serif;
+}
+
 /* 맑은 고딕 (원본 명리학 개요 서식) */
 .font-malgun {
   font-family: "Malgun Gothic", "맑은 고딕", sans-serif;

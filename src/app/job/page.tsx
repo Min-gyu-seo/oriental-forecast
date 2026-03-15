@@ -8,7 +8,7 @@ import {
   TYPE_CHARACTER_IMAGES,
 } from "../test/questions";
 import type { QuestionType } from "../test/questions";
-import { calculateTenGods, TEN_GOD_JOB_TITLES } from "../test/calculateTenGods";
+import { calculateTenGods, type TenGodName } from "../test/calculateTenGods";
 import { getTendencyTypes } from "../test/getTendency";
 
 const LOVER_ANSWERS_KEY = "lover-test-answers";
@@ -28,6 +28,30 @@ const ALL_TYPES: QuestionType[] = [
   "임",
   "계",
 ];
+
+/** 십신 두 개 조합별 노출 문장. 순서 무관 — A-B / B-A 둘 다 등록해 두어 조합만 같으면 노출 */
+const TEN_GOD_PAIR_MESSAGES: Record<string, string> = {
+  "비견-비견":
+    '소울메이트\n똑같은 생각을 하는 두 사람. 굳이 말하지 않아도 서로의 다음 행동을 알고 있어 같이 있으면 가장 편안함.',
+  "겁재-겁재":
+    '운명의 라이벌\n한 명의 승자가 나와야 끝나는 관계. 서로의 존재가 자극제가 되어 평소보다 200%의 실력을 발휘하게 만듦.',
+  "식신-편인":
+    '창작과 자극\n편인이 직관적 아이디어를 툭 던져 동기를 부여하면, 식신이 그걸 끈기 있게 성과물로 빚어냄. 결과를 만드는 환상의 짝꿍.',
+  "편인-식신":
+    '창작과 자극\n편인이 직관적 아이디어를 툭 던져 동기를 부여하면, 식신이 그걸 끈기 있게 성과물로 빚어냄. 결과를 만드는 환상의 짝꿍.',
+  "정인-상관":
+    '도발과 해결\n상관이 선을 넘으며 판을 흔들어 놓으면, 정인이 지혜로운 마음으로 뒷수습을 하며 결국 작품으로 승화시킴.',
+  "상관-정인":
+    '도발과 해결\n상관이 선을 넘으며 판을 흔들어 놓으면, 정인이 지혜로운 마음으로 뒷수습을 하며 결국 작품으로 승화시킴.',
+  "편관-편재":
+    '개척과 싸워지킴\n편재가 미개발 세상에 나가 깃발을 꽂으면, 편관이 그 자리를 아무도 넘보지 못하게 강력한 카리스마로 지켜냄.',
+  "편재-편관":
+    '개척과 싸워지킴\n편재가 미개발 세상에 나가 깃발을 꽂으면, 편관이 그 자리를 아무도 넘보지 못하게 강력한 카리스마로 지켜냄.',
+  "정관-정재":
+    '설계와 운영\n정재가 공정하고 안정적인 계획을 세우면, 정관이 원칙대로 잘 돌아가도록 관리함. 절대 무너지지 않는 철옹성 같은 관계.',
+  "정재-정관":
+    '설계와 운영\n정재가 공정하고 안정적인 계획을 세우면, 정관이 원칙대로 잘 돌아가도록 관리함. 절대 무너지지 않는 철옹성 같은 관계.',
+};
 
 export default function JobCardPage() {
   const [box1, setBox1] = useState<QuestionType[]>([]);
@@ -84,6 +108,17 @@ export default function JobCardPage() {
   const tenGodMyView = hasBoth ? calculateTenGods(me, you) : null;
   const tenGodPartnerView = hasBoth ? calculateTenGods(you, me) : null;
 
+  /** 십신 두 개 조합(순서 무관)으로 노출 문장 조회. A-B / B-A 둘 다 찾음 */
+  const getTenGodPairMessage = (a: TenGodName, b: TenGodName): string => {
+    const key1 = `${a}-${b}`;
+    const key2 = `${b}-${a}`;
+    return TEN_GOD_PAIR_MESSAGES[key1] ?? TEN_GOD_PAIR_MESSAGES[key2] ?? "";
+  };
+  const combinationMessage =
+    hasBoth && tenGodMyView != null && tenGodPartnerView != null
+      ? getTenGodPairMessage(tenGodMyView, tenGodPartnerView)
+      : "";
+
   const getCharBlinkClass = (type: QuestionType): string => {
     if (!testCompleted || (myResultTypes.length === 0 && partnerResultTypes.length === 0)) return "";
     const isMy = myResultTypes.includes(type);
@@ -98,7 +133,7 @@ export default function JobCardPage() {
     <main className="min-h-screen p-8">
       <div className="max-w-2xl mx-auto animate-fade-in-top">
         <h1 className="text-2xl font-bold text-slate-800 mb-8 text-center">
-          우리가 만났을 때 얻게 되는 직업카드는?
+          우리의 궁합 유형은?
         </h1>
 
         {/* 빈 박스 두 개: 왼쪽=나, 오른쪽=상대 */}
@@ -123,6 +158,11 @@ export default function JobCardPage() {
                   }
                 }}
               >
+                {hasBoth && tenGodMyView != null && (
+                  <span className="text-sm font-semibold text-slate-700 mb-1">
+                    {tenGodMyView}
+                  </span>
+                )}
                 <Image
                   src={TYPE_CHARACTER_IMAGES[type]}
                   alt={TYPE_DISPLAY_NAMES[type]}
@@ -158,6 +198,11 @@ export default function JobCardPage() {
                   }
                 }}
               >
+                {hasBoth && tenGodPartnerView != null && (
+                  <span className="text-sm font-semibold text-slate-700 mb-1">
+                    {tenGodPartnerView}
+                  </span>
+                )}
                 <Image
                   src={TYPE_CHARACTER_IMAGES[type]}
                   alt={TYPE_DISPLAY_NAMES[type]}
@@ -175,41 +220,27 @@ export default function JobCardPage() {
           </div>
         </div>
 
-        {/* 십신 결과 카드 두 개 - 왼쪽=내 직업, 오른쪽=상대 직업 (상자는 항상 표시, 내용만 조건부) */}
-        <div className="grid grid-cols-2 gap-4 mb-10">
-          <div>
-            <p className="text-sm font-medium text-slate-600 mb-2 text-center">내 직업</p>
-            <div className="rounded-xl border-2 border-slate-300 bg-white p-6 text-center shadow-sm min-h-[100px] flex items-center justify-center">
-            <p className="text-[#2D2D2D] font-nanum-myeongjo">
-              {hasBoth && tenGodMyView != null ? (
+        {/* 조합별 긴 문장 박스 - 항상 노출, 캐릭터 없으면 빈 상태. "제목\n본문" 형태면 제목을 맨 위에 표시 */}
+        <div className="mb-10">
+          <div className="rounded-xl border-2 border-slate-300 bg-white p-6 shadow-sm min-h-[100px] flex flex-col items-center justify-center">
+            {(() => {
+              const msg = combinationMessage || "—";
+              const hasTitle = msg.includes("\n");
+              const [title, ...bodyParts] = hasTitle ? msg.split("\n") : [null, msg];
+              const body = bodyParts.join("\n");
+              return (
                 <>
-                  <span className="block text-xl font-semibold mb-1 leading-snug">
-                    {TEN_GOD_JOB_TITLES[tenGodMyView]}
-                  </span>
-                  <span className="text-sm opacity-80">{tenGodMyView}</span>
+                  {hasTitle && title && (
+                    <p className="text-[#2D2D2D] font-nanum-gothic text-[17px] font-semibold text-center mb-3">
+                      {title}
+                    </p>
+                  )}
+                  <p className="text-[#2D2D2D] font-nanum-gothic text-[15px] leading-relaxed whitespace-pre-line text-center">
+                    {body || (hasTitle ? "" : msg)}
+                  </p>
                 </>
-              ) : (
-                <span className="text-slate-400">—</span>
-              )}
-            </p>
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-600 mb-2 text-center">상대 직업</p>
-            <div className="rounded-xl border-2 border-slate-300 bg-white p-6 text-center shadow-sm min-h-[100px] flex items-center justify-center">
-            <p className="text-[#2D2D2D] font-nanum-myeongjo">
-              {hasBoth && tenGodPartnerView != null ? (
-                <>
-                  <span className="block text-xl font-semibold mb-1 leading-snug">
-                    {TEN_GOD_JOB_TITLES[tenGodPartnerView]}
-                  </span>
-                  <span className="text-sm opacity-80">{tenGodPartnerView}</span>
-                </>
-              ) : (
-                <span className="text-slate-400">—</span>
-              )}
-            </p>
-            </div>
+              );
+            })()}
           </div>
         </div>
 

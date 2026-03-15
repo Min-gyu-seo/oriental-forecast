@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Nanum_Myeongjo } from "next/font/google";
+import { Nanum_Myeongjo, Nanum_Gothic } from "next/font/google";
 import ScrollToTop from "./ScrollToTop";
 import TopBanner from "./TopBanner";
 import "./globals.css";
@@ -9,6 +9,12 @@ const nanumMyeongjo = Nanum_Myeongjo({
   weight: ["400", "700", "800"],
   subsets: ["latin"],
   variable: "--font-nanum-myeongjo",
+});
+
+const nanumGothic = Nanum_Gothic({
+  weight: ["400", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-nanum-gothic",
 });
 
 export const metadata: Metadata = {
@@ -23,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`antialiased hanji-background ${nanumMyeongjo.variable}`}>
+      <body className={`antialiased hanji-background ${nanumMyeongjo.variable} ${nanumGothic.variable}`}>
         {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-1Y6DZNTRN0"
