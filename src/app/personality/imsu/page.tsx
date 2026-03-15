@@ -87,26 +87,26 @@ export default function ImsuPage() {
         </Link>
 
         <article className="rounded-2xl bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] overflow-hidden">
-          <div className="p-6 sm:p-8 border-b border-[#E8E5DD] flex flex-row items-end gap-4">
-            <div className="flex-1 min-w-0" aria-hidden />
-            <div className="flex flex-col items-center gap-4 shrink-0">
-              <p className="text-2xl font-bold text-[#2D2D2D] text-center">
+          <div className="p-6 sm:p-8 border-b border-[#E8E5DD] flex flex-col sm:flex-row items-center sm:items-end gap-4">
+            <div className="hidden sm:block flex-1 min-w-0" aria-hidden />
+            <div className="flex flex-col items-center gap-4 shrink-0 w-full sm:w-auto">
+              <p className="text-xl sm:text-2xl font-bold text-[#2D2D2D] text-center">
                 지혜로운 전략가, 거대한 흐름을 만드는 기획자
               </p>
-              <div className="relative w-[200px] h-[200px] flex items-center justify-center">
+              <div className="relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex items-center justify-center flex-shrink-0">
                 <Image
                   src={TYPE_CHARACTER_IMAGES.임}
                   alt={TYPE_DISPLAY_NAMES.임}
                   fill
                   className="object-contain"
-                  sizes="200px"
+                  sizes="(max-width: 640px) 160px, 200px"
                 />
               </div>
               <h1 className="text-2xl font-bold text-[#2D2D2D]">
                 {TYPE_DISPLAY_NAMES.임}
               </h1>
             </div>
-            <div className="flex-1 flex justify-end min-w-0">
+            <div className="flex-1 flex justify-center sm:justify-end min-w-0 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleShare}

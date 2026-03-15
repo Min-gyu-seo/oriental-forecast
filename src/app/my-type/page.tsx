@@ -26,6 +26,7 @@ export default function MyTypeTestPage() {
   const shuffledQuestions = useMemo(() => shuffle(MY_TYPE_QUESTIONS), []);
 
   const handleShowResult = () => {
+    if (Object.keys(answers).length !== shuffledQuestions.length) return;
     if (typeof window !== "undefined") {
       try {
         sessionStorage.setItem(MY_TYPE_ANSWERS_KEY, JSON.stringify(answers));
@@ -37,6 +38,7 @@ export default function MyTypeTestPage() {
   };
 
   const answeredCount = Object.keys(answers).length;
+  const allAnswered = answeredCount === shuffledQuestions.length;
 
   return (
     <main className="min-h-screen p-6 sm:p-8">
@@ -67,7 +69,8 @@ export default function MyTypeTestPage() {
           <button
             type="button"
             onClick={handleShowResult}
-            className="px-8 py-4 text-lg font-semibold rounded-xl shadow-sm bg-white text-[#2D2D2D] hover:bg-[#F5F3ED] transition-colors border border-[#E8E5DD]"
+            disabled={!allAnswered}
+            className="px-8 py-4 text-lg font-semibold rounded-xl shadow-sm border border-[#E8E5DD] transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent bg-white text-[#2D2D2D] hover:bg-[#F5F3ED]"
           >
             결과 보기
           </button>
