@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { TYPE_DISPLAY_NAMES, TYPE_CHARACTER_IMAGES } from "../test/questions";
 import type { QuestionType } from "../test/questions";
 
@@ -11,13 +12,13 @@ const ELEMENT_GROUPS: { element: string; types: [QuestionType, QuestionType] }[]
   { element: "물", types: ["임", "계"] },
 ];
 
-/** 속성별 캐릭터 영역 배경 - 위에서 내려오며 2/3 지점에서 완전히 fade out */
-const ELEMENT_BG: Record<string, string> = {
-  나무: "linear-gradient(to bottom, rgba(129, 199, 132, 0.12) 0%, rgba(129, 199, 132, 0) 66.67%)",
-  불: "linear-gradient(to bottom, rgba(239, 154, 154, 0.12) 0%, rgba(239, 154, 154, 0) 66.67%)",
-  흙: "linear-gradient(to bottom, rgba(161, 136, 127, 0.12) 0%, rgba(161, 136, 127, 0) 66.67%)",
-  쇠: "linear-gradient(to bottom, rgba(158, 158, 158, 0.12) 0%, rgba(158, 158, 158, 0) 66.67%)",
-  물: "linear-gradient(to bottom, rgba(100, 181, 246, 0.12) 0%, rgba(100, 181, 246, 0) 66.67%)",
+/** 속성별 한자 */
+const ELEMENT_HANJA: Record<string, string> = {
+  나무: "木",
+  불: "火",
+  흙: "土",
+  쇠: "金",
+  물: "水",
 };
 
 /** 속성별 한 줄 설명 */
@@ -82,46 +83,71 @@ export default function PersonalityPage() {
             className="w-full rounded-2xl bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] py-6 px-6 pb-8"
           >
             <h2 className="text-2xl font-bold text-[#2D2D2D] text-center mb-2">
-              {element}
+              {element} <span className="font-normal">({ELEMENT_HANJA[element]})</span>
             </h2>
             <p className="text-sm text-[#2D2D2D] opacity-90 text-center mb-6">
               {ELEMENT_DESCRIPTIONS[element]}
             </p>
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center">
-              {types.map((type) => (
-                <div
-                  key={type}
-                  className="min-h-[420px] w-full max-w-[280px] rounded-2xl bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden"
-                >
+              {types.map((type) => {
+                const card = (
                   <div
-                    className="h-[250px] shrink-0 flex items-center justify-center border-b border-[#E8E5DD] p-3"
-                    style={{ background: ELEMENT_BG[element] }}
+                    className="min-h-[420px] w-full max-w-[280px] rounded-2xl bg-white shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden"
                   >
-                    <div className="relative w-full h-full min-h-[140px]">
-                      <Image
-                        src={TYPE_CHARACTER_IMAGES[type]}
-                        alt={TYPE_DISPLAY_NAMES[type]}
-                        fill
-                        className="object-contain"
-                        sizes="(max-width: 280px) 240px, 240px"
-                      />
+                    <div
+                      className="min-h-[250px] shrink-0 relative flex flex-col items-center justify-end border-b border-[#E8E5DD] p-3 pb-6"
+                    >
+                      {/* 캐릭터 150px */}
+                      <div className="w-[150px] flex flex-col items-center flex-1 justify-end pt-8 pb-1 min-h-0">
+                        <div className="relative w-full aspect-[0.85] flex-1 min-h-0">
+                          <Image
+                            src={TYPE_CHARACTER_IMAGES[type]}
+                            alt={TYPE_DISPLAY_NAMES[type]}
+                            fill
+                            className="object-contain object-bottom"
+                            sizes="150px"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col shrink-0 items-center text-center gap-2 py-4 px-5">
+                      <span className="text-base font-bold text-[#2D2D2D]">
+                        {TYPE_DISPLAY_NAMES[type]}
+                      </span>
+                      <p className="text-xs text-[#2D2D2D] opacity-90">
+                        {TYPE_DESCRIPTIONS[type]}
+                      </p>
+                    </div>
+                    <div className="flex-1 min-h-0 flex items-center justify-center px-5 pb-5">
+                      <p className="text-sm text-[#2D2D2D] opacity-90 leading-relaxed text-center">
+                        {TYPE_DETAIL_DESCRIPTIONS[type]}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex flex-col shrink-0 items-center text-center gap-2 py-4 px-5">
-                    <span className="text-base font-bold text-[#2D2D2D]">
-                      {TYPE_DISPLAY_NAMES[type]}
-                    </span>
-                    <p className="text-xs text-[#2D2D2D] opacity-90">
-                      {TYPE_DESCRIPTIONS[type]}
-                    </p>
+                );
+                const typeHref: Record<string, string> = {
+                  갑: "/personality/gapmok",
+                  을: "/personality/eulmok",
+                  병: "/personality/byeonghwa",
+                  정: "/personality/jeonghwa",
+                  무: "/personality/muto",
+                  기: "/personality/gitoo",
+                  경: "/personality/gyeonggeum",
+                  신: "/personality/shingeum",
+                  임: "/personality/imsu",
+                  계: "/personality/gyesu",
+                };
+                const href = typeHref[type];
+                return href ? (
+                  <Link key={type} href={href} className="w-full max-w-[280px] justify-self-center" style={{ cursor: "pointer" }}>
+                    {card}
+                  </Link>
+                ) : (
+                  <div key={type} className="w-full max-w-[280px] justify-self-center">
+                    {card}
                   </div>
-                  <div className="flex-1 min-h-0 flex items-center justify-center px-5 pb-5">
-                    <p className="text-sm text-[#2D2D2D] opacity-90 leading-relaxed text-center">
-                      {TYPE_DETAIL_DESCRIPTIONS[type]}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}

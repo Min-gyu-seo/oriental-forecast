@@ -22,20 +22,32 @@ export default function Home() {
         </h1>
       </div>
 
-      <div className="relative z-10 flex-1 flex items-center justify-center w-full max-w-md px-4 mt-6 sm:-mt-16">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-md px-4 mt-6 sm:-mt-16">
         <div className="w-full py-6 px-6 text-[#2D2D2D] text-[17px] leading-relaxed text-center bg-white border-[3px] border-[#2D2D2D]/40 rounded-2xl shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)]">
           서양에서는 &apos;나&apos;를 독립적인 존재로 인식합니다. 그러나 동양에서는 &apos;나&apos;를 타인과의 관계 속에서 존재하는 것으로 인식합니다.
           <br />
           이 차이점에서 시작한 명리학 기반의 성격검사 테스트를 무료로 체험해 보세요.
         </div>
+        <Link
+          href="/brand"
+          className="mt-4 text-[#2D2D2D] text-base font-medium underline underline-offset-2 hover:opacity-80 transition-opacity"
+        >
+          오리엔탈포캐스트 알아보기
+        </Link>
       </div>
 
       <div className="relative z-10 flex flex-col gap-4 mt-auto mb-32">
         <Link
-          href="/select"
-          className="px-8 py-4 text-lg font-semibold text-[#2D2D2D] bg-white rounded-xl hover:bg-[#F5F3ED] transition-colors shadow-sm border border-[#E8E5DD] sparkle-button text-center"
+          href="/my-type"
+          className="px-8 py-4 text-lg font-semibold text-[#2D2D2D] bg-white rounded-xl hover:bg-[#F5F3ED] transition-colors shadow-sm border border-[#E8E5DD] text-center"
         >
-          우리의 유형 알아보기
+          나의 성격유형 테스트
+        </Link>
+        <Link
+          href="/partner-type"
+          className="px-8 py-4 text-lg font-semibold text-[#2D2D2D] bg-white rounded-xl hover:bg-[#F5F3ED] transition-colors shadow-sm border border-[#E8E5DD] text-center"
+        >
+          상대방의 성격유형 테스트
         </Link>
       </div>
 

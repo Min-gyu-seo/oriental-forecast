@@ -83,6 +83,61 @@ body > * {
   font-family: var(--font-nanum-myeongjo), serif;
 }
 
+/* 맑은 고딕 (원본 명리학 개요 서식) */
+.font-malgun {
+  font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+}
+
+/* 명리학 개요 페이지 — 원본 명리학 개요2.htm 서식 */
+.myeongri-h2 {
+  font-size: 18pt;
+  margin-top: 1.5em;
+  margin-bottom: 0.25em;
+}
+.prose > .myeongri-h2:first-child {
+  margin-top: 0;
+}
+/* 원본 표1: 연한 파란 배경 */
+.myeongri-table-simple {
+  background: #F0F4F9;
+  border-collapse: collapse;
+  width: 100%;
+}
+.myeongri-table-simple th,
+.myeongri-table-simple td {
+  background: #F8FAFD;
+  padding: 6pt 9pt;
+  border: none;
+  text-align: left;
+}
+.myeongri-table-simple thead th {
+  font-weight: bold;
+}
+.myeongri-table-simple .text-center {
+  text-align: center;
+}
+/* 원본 표2: 테두리 있는 표 */
+.myeongri-table-bordered {
+  border-collapse: collapse;
+  width: 100%;
+}
+.myeongri-table-bordered th,
+.myeongri-table-bordered td {
+  border: 1px solid #333;
+  padding: 3pt 3pt;
+  text-align: left;
+}
+.myeongri-table-bordered thead th {
+  font-weight: bold;
+  text-align: center;
+}
+.myeongri-table-bordered td {
+  vertical-align: top;
+}
+.myeongri-table-bordered .text-center {
+  text-align: center;
+}
+
 /* 한지 느낌의 원형 버튼 스타일 */
 .hanji-circle-button {
   position: relative;

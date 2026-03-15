@@ -32,17 +32,9 @@ const ALL_TYPES: QuestionType[] = [
 export default function JobCardPage() {
   const [box1, setBox1] = useState<QuestionType[]>([]);
   const [box2, setBox2] = useState<QuestionType[]>([]);
-  const [dragging, setDragging] = useState<QuestionType | null>(null);
   const [testCompleted, setTestCompleted] = useState(false);
   const [myResultTypes, setMyResultTypes] = useState<QuestionType[]>([]);
   const [partnerResultTypes, setPartnerResultTypes] = useState<QuestionType[]>([]);
-  const [touchDrag, setTouchDrag] = useState<{
-    type: QuestionType;
-    source: "pool" | "box1" | "box2";
-    startX: number;
-    startY: number;
-  } | null>(null);
-
   useEffect(() => {
     try {
       const raw = typeof window !== "undefined" ? sessionStorage.getItem(LOVER_ANSWERS_KEY) : null;
@@ -67,169 +59,16 @@ export default function JobCardPage() {
 
   const usageCount = (t: QuestionType) =>
     box1.filter((x) => x === t).length + box2.filter((x) => x === t).length;
-  const canDragFromPool = (t: QuestionType) => usageCount(t) < 2;
+  const canSelectFromPool = (t: QuestionType) => usageCount(t) < 2;
 
-  const removeOne = (arr: QuestionType[], type: QuestionType): QuestionType[] => {
-    const i = arr.indexOf(type);
-    return i === -1 ? arr : [...arr.slice(0, i), ...arr.slice(i + 1)];
-  };
-
-  const handleDragStart = (
-    e: React.DragEvent,
-    type: QuestionType,
-    source: "pool" | "box1" | "box2"
-  ) => {
-    setDragging(type);
-    e.dataTransfer.setData("text/plain", type);
-    e.dataTransfer.setData("application/x-source", source);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragEnd = () => {
-    setDragging(null);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDropOnBox = (
-    e: React.DragEvent,
-    setBox: React.Dispatch<React.SetStateAction<QuestionType[]>>,
-    targetBox: "box1" | "box2",
-    currentBox: QuestionType[]
-  ) => {
-    e.preventDefault();
-    const type = e.dataTransfer.getData("text/plain") as QuestionType;
-    const source = e.dataTransfer.getData("application/x-source") as "pool" | "box1" | "box2";
-    if (!type || !ALL_TYPES.includes(type)) return;
-    if (source === targetBox) {
-      setDragging(null);
-      return;
-    }
-    const alreadyHasOne = currentBox.length >= 1;
-    const currentChar = currentBox[0];
-
-    if (alreadyHasOne) {
-      // 박스에 이미 캐릭터가 있음 → 스왑
-      if (source === "pool") {
-        setBox([type]); // 새 캐릭터로 교체, 기존 캐릭터는 풀로
-      } else {
-        // 다른 박스에서 드래그 → 두 박스 내용 스왑
-        setBox1(targetBox === "box1" ? [type] : [currentChar]);
-        setBox2(targetBox === "box2" ? [type] : [currentChar]);
-      }
+  /** 풀에서 캐릭터 클릭 시: '나'가 비어 있으면 나에, '나'에 있으면 '상대'에 배치 */
+  const handlePoolCharacterClick = (type: QuestionType) => {
+    if (!canSelectFromPool(type)) return;
+    if (box1.length === 0) {
+      setBox1([type]);
     } else {
-      // 박스가 비어 있음 → 하나만 넣기
-      if (source === "box1") {
-        setBox1((prev) => removeOne(prev, type));
-      } else if (source === "box2") {
-        setBox2((prev) => removeOne(prev, type));
-      }
-      setBox([type]);
+      setBox2([type]);
     }
-    setDragging(null);
-  };
-
-  const handleDropOnPool = (e: React.DragEvent) => {
-    e.preventDefault();
-    const type = e.dataTransfer.getData("text/plain") as QuestionType;
-    const source = e.dataTransfer.getData("application/x-source") as "pool" | "box1" | "box2";
-    if (!type || !ALL_TYPES.includes(type)) return;
-    if (source === "box1") {
-      setBox1((prev) => removeOne(prev, type));
-    } else if (source === "box2") {
-      setBox2((prev) => removeOne(prev, type));
-    }
-    setDragging(null);
-  };
-
-  // 모바일 터치 이벤트 핸들러
-  const handleTouchStart = (
-    e: React.TouchEvent,
-    type: QuestionType,
-    source: "pool" | "box1" | "box2"
-  ) => {
-    setTouchDrag({
-      type,
-      source,
-      startX: e.touches[0].clientX,
-      startY: e.touches[0].clientY,
-    });
-    setDragging(type);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!touchDrag) return;
-    e.preventDefault();
-  };
-
-  const handleTouchEndOnBox = (
-    e: React.TouchEvent,
-    targetBox: "box1" | "box2",
-    setBox: React.Dispatch<React.SetStateAction<QuestionType[]>>,
-    currentBox: QuestionType[]
-  ) => {
-    if (!touchDrag) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const type = touchDrag.type;
-    const source = touchDrag.source;
-    
-    if (source === targetBox) {
-      setTouchDrag(null);
-      setDragging(null);
-      return;
-    }
-
-    const alreadyHasOne = currentBox.length >= 1;
-    const currentChar = currentBox[0];
-
-    if (alreadyHasOne) {
-      if (source === "pool") {
-        setBox([type]);
-      } else {
-        setBox1(targetBox === "box1" ? [type] : [currentChar]);
-        setBox2(targetBox === "box2" ? [type] : [currentChar]);
-      }
-    } else {
-      if (source === "box1") {
-        setBox1((prev) => removeOne(prev, type));
-      } else if (source === "box2") {
-        setBox2((prev) => removeOne(prev, type));
-      }
-      setBox([type]);
-    }
-
-    setTouchDrag(null);
-    setDragging(null);
-  };
-
-  const handleTouchEndOnPool = (e: React.TouchEvent) => {
-    if (!touchDrag) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const type = touchDrag.type;
-    const source = touchDrag.source;
-
-    if (source === "box1") {
-      setBox1((prev) => removeOne(prev, type));
-    } else if (source === "box2") {
-      setBox2((prev) => removeOne(prev, type));
-    }
-
-    setTouchDrag(null);
-    setDragging(null);
-  };
-
-  const handleTouchEndOnCharacter = (e: React.TouchEvent) => {
-    if (!touchDrag) return;
-    // 캐릭터에서 터치가 끝나면 드롭 취소
-    setTouchDrag(null);
-    setDragging(null);
   };
 
   const removeFromBoxByIndex = (
@@ -267,41 +106,34 @@ export default function JobCardPage() {
           <div>
             <p className="text-sm font-medium text-slate-600 mb-2 text-center">나</p>
             <div
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDropOnBox(e, setBox1, "box1", box1)}
-              onTouchEnd={(e) => handleTouchEndOnBox(e, "box1", setBox1, box1)}
               className="min-h-[200px] rounded-xl border-2 border-dashed bg-white/80 flex flex-wrap items-center justify-center gap-3 p-4"
               style={{ borderColor: "#C85D5D" }}
             >
             {box1.map((type, index) => (
               <div
                 key={`box1-${index}-${type}`}
-                className="relative flex flex-col items-center"
-                draggable
-                onDragStart={(e) => handleDragStart(e, type, "box1")}
-                onDragEnd={handleDragEnd}
-                onTouchStart={(e) => handleTouchStart(e, type, "box1")}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEndOnCharacter}
+                role="button"
+                tabIndex={0}
+                className="relative flex flex-col items-center cursor-pointer"
+                onClick={() => removeFromBoxByIndex(index, setBox1)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    removeFromBoxByIndex(index, setBox1);
+                  }
+                }}
               >
                 <Image
                   src={TYPE_CHARACTER_IMAGES[type]}
                   alt={TYPE_DISPLAY_NAMES[type]}
                   width={80}
                   height={80}
-                  className="object-contain cursor-grab active:cursor-grabbing opacity-90"
+                  className="object-contain opacity-90"
+                  draggable={false}
                 />
                 <span className="text-xs font-medium text-slate-600">
                   {TYPE_DISPLAY_NAMES[type]}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => removeFromBoxByIndex(index, setBox1)}
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-400 text-white text-xs flex items-center justify-center hover:bg-slate-500"
-                  aria-label="제거"
-                >
-                  ×
-                </button>
               </div>
             ))}
             </div>
@@ -309,41 +141,34 @@ export default function JobCardPage() {
           <div>
             <p className="text-sm font-medium text-slate-600 mb-2 text-center">상대</p>
             <div
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDropOnBox(e, setBox2, "box2", box2)}
-              onTouchEnd={(e) => handleTouchEndOnBox(e, "box2", setBox2, box2)}
               className="min-h-[200px] rounded-xl border-2 border-dashed bg-white/80 flex flex-wrap items-center justify-center gap-3 p-4"
               style={{ borderColor: "#3b82f6" }}
             >
             {box2.map((type, index) => (
               <div
                 key={`box2-${index}-${type}`}
-                className="relative flex flex-col items-center"
-                draggable
-                onDragStart={(e) => handleDragStart(e, type, "box2")}
-                onDragEnd={handleDragEnd}
-                onTouchStart={(e) => handleTouchStart(e, type, "box2")}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEndOnCharacter}
+                role="button"
+                tabIndex={0}
+                className="relative flex flex-col items-center cursor-pointer"
+                onClick={() => removeFromBoxByIndex(index, setBox2)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    removeFromBoxByIndex(index, setBox2);
+                  }
+                }}
               >
                 <Image
                   src={TYPE_CHARACTER_IMAGES[type]}
                   alt={TYPE_DISPLAY_NAMES[type]}
                   width={80}
                   height={80}
-                  className="object-contain cursor-grab active:cursor-grabbing opacity-90"
+                  className="object-contain opacity-90"
+                  draggable={false}
                 />
                 <span className="text-xs font-medium text-slate-600">
                   {TYPE_DISPLAY_NAMES[type]}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => removeFromBoxByIndex(index, setBox2)}
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-slate-400 text-white text-xs flex items-center justify-center hover:bg-slate-500"
-                  aria-label="제거"
-                >
-                  ×
-                </button>
               </div>
             ))}
             </div>
@@ -390,32 +215,27 @@ export default function JobCardPage() {
 
         {/* 캐릭터 10개 - 박스 밑에 배치 */}
         <p className="text-sm text-slate-600 mb-4 text-center">
-          아래 캐릭터를 박스로 드래그해서 넣어보세요.
+          나의 성향과 상대방의 성향을 순서대로 클릭해 주세요.
         </p>
-        <div
-          onDragOver={handleDragOver}
-          onDrop={handleDropOnPool}
-          onTouchEnd={handleTouchEndOnPool}
-          className="flex flex-wrap items-center justify-center gap-4 p-6 rounded-xl border border-slate-200 bg-slate-50/50 min-h-[140px]"
-        >
+        <div className="flex flex-wrap items-center justify-center gap-4 p-6 rounded-xl border border-slate-200 bg-slate-50/50 min-h-[140px]">
           {ALL_TYPES.map((type) => {
-            const canDrag = canDragFromPool(type);
-            const isDraggingThis = dragging === type;
+            const canSelect = canSelectFromPool(type);
             const charBlinkClass = getCharBlinkClass(type);
             return (
               <div
                 key={type}
-                draggable={canDrag}
-                onDragStart={(e) => canDrag && handleDragStart(e, type, "pool")}
-                onDragEnd={handleDragEnd}
-                onTouchStart={(e) => canDrag && handleTouchStart(e, type, "pool")}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEndOnCharacter}
-                className={`flex flex-col items-center gap-1 ${
-                  !canDrag
-                    ? "opacity-40 pointer-events-none"
-                    : "cursor-grab active:cursor-grabbing touch-manipulation"
-                } ${isDraggingThis ? "opacity-50" : ""}`}
+                role="button"
+                tabIndex={canSelect ? 0 : -1}
+                onClick={() => canSelect && handlePoolCharacterClick(type)}
+                onKeyDown={(e) => {
+                  if ((e.key === "Enter" || e.key === " ") && canSelect) {
+                    e.preventDefault();
+                    handlePoolCharacterClick(type);
+                  }
+                }}
+                className={`flex flex-col items-center gap-1 touch-manipulation ${
+                  !canSelect ? "opacity-40 pointer-events-none" : "cursor-pointer"
+                }`}
               >
                 <span className={charBlinkClass ? `inline-block ${charBlinkClass}` : "inline-block"}>
                   <Image
