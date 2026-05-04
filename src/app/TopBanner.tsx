@@ -4,7 +4,6 @@ import Image from "next/image";
 const MENU_ITEMS = [
   { label: "성격유형", href: "/personality" },
   { label: "관계유형", href: "/relationship" },
-  { label: "궁합 계산기", href: "/job" },
   { label: "명리학", href: "/myeongri" },
 ] as const;
 
