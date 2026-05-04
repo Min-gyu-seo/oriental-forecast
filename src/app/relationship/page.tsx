@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { type TenGodName } from "../test/calculateTenGods";
+import { TEN_GOD_DETAIL_HREF } from "./tenGodDetailPaths";
 
 const TEN_GODS: TenGodName[] = [
   "비견",
@@ -40,12 +41,9 @@ export default function RelationshipPage() {
       <hr className="w-full max-w-4xl border-[#E8E5DD] mb-8" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-4xl">
         {TEN_GODS.map((name) => {
-          const detailHref =
-            name === "비견" ? "/relationship/biyeon" : name === "겁재" ? "/relationship/geopjae" : name === "식신" ? "/relationship/siksin" : name === "상관" ? "/relationship/sangwan" : name === "편재" ? "/relationship/pyeonjae" : name === "정재" ? "/relationship/jeongjae" : name === "편관" ? "/relationship/pyeongwan" : name === "정관" ? "/relationship/jeonggwan" : name === "편인" ? "/relationship/pyeonin" : name === "정인" ? "/relationship/jeongin" : null;
-          const isClickable = detailHref != null;
+          const detailHref = TEN_GOD_DETAIL_HREF[name];
           const boxClass =
-            "py-5 px-4 rounded-2xl bg-white/30 backdrop-blur-sm border-2 border-[#2D2D2D]/15 shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] text-center" +
-            (isClickable ? " cursor-pointer hover:bg-white/50 transition-colors" : "");
+            "py-5 px-4 rounded-2xl bg-white/30 backdrop-blur-sm border-2 border-[#2D2D2D]/15 shadow-[0_4px_14px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.04)] text-center cursor-pointer hover:bg-white/50 transition-colors";
           const content = (
             <>
               <p className="text-[#2D2D2D] font-nanum-myeongjo font-semibold text-xl mb-2 leading-snug">
@@ -56,14 +54,10 @@ export default function RelationshipPage() {
               </p>
             </>
           );
-          return detailHref ? (
+          return (
             <Link key={name} href={detailHref} className={boxClass}>
               {content}
             </Link>
-          ) : (
-            <div key={name} className={boxClass}>
-              {content}
-            </div>
           );
         })}
       </div>

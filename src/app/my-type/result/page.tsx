@@ -12,6 +12,7 @@ import { getTendencyTypes } from "../../test/getTendency";
 import {
   getTenStemScores,
   getFiveElementScores,
+  getTheoreticalScoreBoundsForQuestions,
 } from "../../test/calculateScores";
 import type { QuestionType } from "../../test/questions";
 import RadarChart from "../../select/lover/result/RadarChart";
@@ -21,6 +22,9 @@ const MY_TYPE_ANSWERS_KEY = "my-type-answers";
 const MY_TYPE_QUESTIONS = QUESTIONS.filter(
   (q) => q.category === "연인" && q.subject === "나"
 );
+
+const MY_TYPE_SCORE_BOUNDS =
+  getTheoreticalScoreBoundsForQuestions(MY_TYPE_QUESTIONS);
 
 export default function MyTypeResultPage() {
   const [types, setTypes] = useState<QuestionType[]>([]);
@@ -51,8 +55,6 @@ export default function MyTypeResultPage() {
   }, []);
 
   const fiveElementScores = getFiveElementScores(tenStemScores);
-  const tenStemMax = Math.max(...Object.values(tenStemScores), 1);
-  const fiveElementMax = Math.max(...Object.values(fiveElementScores), 1);
 
   return (
     <main className="min-h-screen p-6 sm:p-8">
@@ -97,7 +99,8 @@ export default function MyTypeResultPage() {
                   </span>
                   <RadarChart
                     fiveElementScores={fiveElementScores}
-                    maxScore={fiveElementMax}
+                    minScore={MY_TYPE_SCORE_BOUNDS.fiveElement.min}
+                    maxScore={MY_TYPE_SCORE_BOUNDS.fiveElement.max}
                     size={120}
                   />
                 </div>
@@ -108,7 +111,8 @@ export default function MyTypeResultPage() {
                   </span>
                   <RadarChart
                     tenStemScores={tenStemScores}
-                    maxScore={tenStemMax}
+                    minScore={MY_TYPE_SCORE_BOUNDS.tenStem.min}
+                    maxScore={MY_TYPE_SCORE_BOUNDS.tenStem.max}
                     size={120}
                   />
                 </div>

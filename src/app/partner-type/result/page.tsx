@@ -11,12 +11,16 @@ import { getTendencyTypes } from "../../test/getTendency";
 import {
   getTenStemScores,
   getFiveElementScores,
+  getTheoreticalScoreBoundsForQuestions,
 } from "../../test/calculateScores";
 import type { QuestionType } from "../../test/questions";
 import RadarChart from "../../select/lover/result/RadarChart";
 import { PARTNER_TYPE_QUESTIONS } from "../partnerTypeQuestions";
 
 const PARTNER_TYPE_ANSWERS_KEY = "partner-type-answers";
+
+const PARTNER_TYPE_SCORE_BOUNDS =
+  getTheoreticalScoreBoundsForQuestions(PARTNER_TYPE_QUESTIONS);
 
 export default function PartnerTypeResultPage() {
   const [types, setTypes] = useState<QuestionType[]>([]);
@@ -47,8 +51,6 @@ export default function PartnerTypeResultPage() {
   }, []);
 
   const fiveElementScores = getFiveElementScores(tenStemScores);
-  const tenStemMax = Math.max(...Object.values(tenStemScores), 1);
-  const fiveElementMax = Math.max(...Object.values(fiveElementScores), 1);
 
   return (
     <main className="min-h-screen p-6 sm:p-8">
@@ -93,7 +95,8 @@ export default function PartnerTypeResultPage() {
                   </span>
                   <RadarChart
                     fiveElementScores={fiveElementScores}
-                    maxScore={fiveElementMax}
+                    minScore={PARTNER_TYPE_SCORE_BOUNDS.fiveElement.min}
+                    maxScore={PARTNER_TYPE_SCORE_BOUNDS.fiveElement.max}
                     size={120}
                   />
                 </div>
@@ -104,7 +107,8 @@ export default function PartnerTypeResultPage() {
                   </span>
                   <RadarChart
                     tenStemScores={tenStemScores}
-                    maxScore={tenStemMax}
+                    minScore={PARTNER_TYPE_SCORE_BOUNDS.tenStem.min}
+                    maxScore={PARTNER_TYPE_SCORE_BOUNDS.tenStem.max}
                     size={120}
                   />
                 </div>

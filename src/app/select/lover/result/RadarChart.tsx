@@ -17,18 +17,34 @@ interface RadarChartProps {
     | "계",
     number
   >;
-  /** 최대 점수 (스케일링용) */
+  /** 이론상·스케일 최소 (중심 = 이 값) */
+  minScore?: number;
+  /** 이론상·스케일 최대 (외곽 = 이 값) */
   maxScore: number;
   /** 그래프 크기 */
   size?: number;
 }
 
+function normalizeToRadius(
+  score: number,
+  minScore: number,
+  maxScore: number,
+  radius: number
+): number {
+  const span = maxScore - minScore;
+  if (span <= 0) return 0;
+  const t = (score - minScore) / span;
+  return radius * Math.min(Math.max(t, 0), 1);
+}
+
 export default function RadarChart({
   fiveElementScores,
   tenStemScores,
+  minScore: minScoreProp,
   maxScore,
   size = 200,
 }: RadarChartProps) {
+  const minScore = minScoreProp ?? 0;
   const center = size / 2;
   const radius = size * 0.4;
 
@@ -43,8 +59,7 @@ export default function RadarChart({
     ];
 
     const points = elements.map((el) => {
-      const normalizedScore = maxScore > 0 ? Math.min(el.score / maxScore, 1) : 0;
-      const r = radius * normalizedScore;
+      const r = normalizeToRadius(el.score, minScore, maxScore, radius);
       return {
         x: center + r * Math.cos(el.angle),
         y: center + r * Math.sin(el.angle),
@@ -192,8 +207,7 @@ export default function RadarChart({
     ];
 
     const points = stems.map((stem) => {
-      const normalizedScore = maxScore > 0 ? Math.min(stem.score / maxScore, 1) : 0;
-      const r = radius * normalizedScore;
+      const r = normalizeToRadius(stem.score, minScore, maxScore, radius);
       return {
         x: center + r * Math.cos(stem.angle),
         y: center + r * Math.sin(stem.angle),

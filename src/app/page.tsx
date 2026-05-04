@@ -10,6 +10,7 @@ import {
 } from "./test/questions";
 import type { QuestionType } from "./test/questions";
 import { calculateTenGods, type TenGodName } from "./test/calculateTenGods";
+import { TEN_GOD_DETAIL_HREF } from "./relationship/tenGodDetailPaths";
 import { getTendencyTypes } from "./test/getTendency";
 
 /** '나' 기준으로 상대에 대한 십신이 무엇인지에 따른 해설 */
@@ -250,24 +251,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 나 기준 십신 해설 */}
+        {/* 나 기준 십신 해설 — 클릭 시 해당 십신 설명 페이지로 이동 */}
         <div className="mb-10">
-          <div className="rounded-xl border-2 border-slate-300 bg-white p-6 shadow-sm min-h-[100px] flex flex-col items-center justify-center text-center">
-            {myViewCopy ? (
-              <>
-                <p className="text-[#2D2D2D] font-nanum-gothic text-[17px] font-semibold mb-3">
-                  {myViewCopy.headline}
-                </p>
-                <p className="text-[#2D2D2D] font-nanum-gothic text-[15px] leading-relaxed max-w-prose">
-                  {myViewCopy.description}
-                </p>
-              </>
-            ) : (
+          {myViewCopy && tenGodFromMyView ? (
+            <Link
+              href={TEN_GOD_DETAIL_HREF[tenGodFromMyView]}
+              className="block rounded-xl border-2 border-slate-300 bg-white p-6 shadow-sm min-h-[100px] flex flex-col items-center justify-center text-center cursor-pointer hover:border-slate-400 hover:bg-slate-50/80 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+            >
+              <p className="text-[#2D2D2D] font-nanum-gothic text-[17px] font-semibold mb-3">
+                {myViewCopy.headline}
+              </p>
+              <p className="text-[#2D2D2D] font-nanum-gothic text-[15px] leading-relaxed max-w-prose">
+                {myViewCopy.description}
+              </p>
+            </Link>
+          ) : (
+            <div className="rounded-xl border-2 border-slate-300 bg-white p-6 shadow-sm min-h-[100px] flex flex-col items-center justify-center text-center">
               <p className="text-slate-500 font-nanum-gothic text-[15px] leading-relaxed">
                 만나는 상대방에 따라 부각되는 나의 특징
               </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* 캐릭터 10개 - 박스 밑에 배치 */}
